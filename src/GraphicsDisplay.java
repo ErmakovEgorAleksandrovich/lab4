@@ -200,7 +200,97 @@ minY
             //маркер
             path.append(new Line2D.Double(center.getX() + 11.0, center.getY() - 0.0, center.getX() - 11.0, center.getY() - 0.0), true);
             path.append(new Line2D.Double(center.getX() + 0.0, center.getY() + 11.0, center.getX() + 0.0, center.getY() - 11.0), true);
-            path.append(new  Ellipse2D.Double(-11, -11, 11, 11), true);
+            path.append(new  Ellipse2D.Double(center.getX() - 11.0,center.getY() - 11.0, 11, 11), true);
             canvas.fill(path);
             canvas.draw(path);
         }
+    }
+    
+    //отображение осей координат
+    protected void paintAxis(Graphics2D canvas) {
+        canvas.setStroke(axisStroke);
+        canvas.setColor(Color.BLACK);
+        canvas.setPaint(Color.BLACK);
+        canvas.setFont(axisFont);
+// Создать объект контекста отображения текста - для получения характеристик устройства (экрана)
+        FontRenderContext context = canvas.getFontRenderContext();
+// Определить, должна ли быть видна ось Y на графике
+        if (minX<=0.0 && maxX>=0.0) {
+            canvas.draw(new Line2D.Double(xyToPoint(0, maxY),
+                    xyToPoint(0, minY)));
+            GeneralPath arrow = new GeneralPath();
+// Установить начальную точку ломаной точно на верхний конец оси Y
+            Point2D.Double lineEnd = xyToPoint(0, maxY);
+            arrow.moveTo(lineEnd.getX(), lineEnd.getY());
+// Вести левый "скат" стрелки в точку с относительными координатами (5,20)
+            arrow.lineTo(arrow.getCurrentPoint().getX()+5,
+                    arrow.getCurrentPoint().getY()+20);
+// Вести нижнюю часть стрелки в точку с относительными координатами (-10, 0)
+            arrow.lineTo(arrow.getCurrentPoint().getX()-10,
+                    arrow.getCurrentPoint().getY());
+// Замкнуть треугольник стрелки
+            arrow.closePath();
+            canvas.draw(arrow); // Нарисовать стрелку
+            canvas.fill(arrow); // Закрасить стрелку
+            Rectangle2D bounds = axisFont.getStringBounds("y", context);
+            Point2D.Double labelPos = xyToPoint(0, maxY);
+// Вывести надпись в точке с вычисленными координатами
+            canvas.drawString("y", (float)labelPos.getX() + 10,
+                    (float)(labelPos.getY() - bounds.getY()));
+        }
+// Определить, должна ли быть видна ось X на графике
+        if (minY<=0.0 && maxY>=0.0) {
+            canvas.draw(new Line2D.Double(xyToPoint(minX, 0),
+                    xyToPoint(maxX, 0)));
+            GeneralPath arrow = new GeneralPath();
+// Установить начальную точку ломаной точно на правый конец оси X
+            Point2D.Double lineEnd = xyToPoint(maxX, 0);
+            arrow.moveTo(lineEnd.getX(), lineEnd.getY());
+// Вести верхний "скат" стрелки в точку с относительными координатами (-20,-5)
+            arrow.lineTo(arrow.getCurrentPoint().getX()-20,
+                    arrow.getCurrentPoint().getY()-5);
+// Вести левую часть стрелки в точку с относительными координатами (0, 10)
+            arrow.lineTo(arrow.getCurrentPoint().getX(),
+                    arrow.getCurrentPoint().getY()+10);
+// Замкнуть треугольник стрелки
+            arrow.closePath();
+            canvas.draw(arrow); // Нарисовать стрелку
+            canvas.fill(arrow); // Закрасить стрелку
+// Нарисовать подпись к оси X
+// Определить, сколько места понадобится для надписи "x"
+            Rectangle2D bounds = axisFont.getStringBounds("x", context);
+            Point2D.Double labelPos = xyToPoint(maxX, 0);
+// Вывести надпись в точке с вычисленными координатами
+            canvas.drawString("x", (float)(labelPos.getX() -
+                    bounds.getWidth() - 10), (float)(labelPos.getY() + bounds.getY()));
+        }
+    }
+
+    /* Метод-помощник, осуществляющий преобразование координат.
+    * Оно необходимо, т.к. верхнему левому углу холста с координатами
+    * (0.0, 0.0) соответствует точка графика с координатами (minX, maxY),
+    где
+    * minX - это самое "левое" значение X, а
+    * maxY - самое "верхнее" значение Y.
+    */
+    protected Point2D.Double xyToPoint(double x, double y) {
+// Вычисляем смещение X от самой левой точки (minX)
+        double deltaX = x - minX;
+// Вычисляем смещение Y от точки верхней точки (maxY)
+        double deltaY = maxY - y;
+        return new Point2D.Double(deltaX*scale, deltaY*scale);
+    }
+
+    /* Метод-помощник, возвращающий экземпляр класса Point2D.Double
+     * смещѐнный по отношению к исходному на deltaX, deltaY
+     * К сожалению, стандартного метода, выполняющего такую задачу, нет.
+     */
+    protected Point2D.Double shiftPoint(Point2D.Double src, double deltaX,
+                                        double deltaY) {
+// Инициализировать новый экземпляр точки
+        Point2D.Double dest = new Point2D.Double();
+// Задать еѐ координаты как координаты существующей точки + заданные смещения
+        dest.setLocation(src.getX() + deltaX, src.getY() + deltaY);
+        return dest;
+    }
+}
