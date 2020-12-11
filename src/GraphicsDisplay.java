@@ -192,16 +192,21 @@ minY
         for (Double[] point : graphicsData) {
             GeneralPath path = new GeneralPath();
             Point2D.Double center = xyToPoint(point[0], point[1]);
-            // если целая часть значения функции в точке - нечѐтная
-            if (isOdd(point[1])) {
-                canvas.setPaint(Color.RED);
-            }
-            else canvas.setColor(Color.GREEN);
+
+            int a = point[1].intValue();
+            do
+            {
+                if (a % 2 == 0) {
+                    canvas.setPaint(Color.RED);
+                }
+                else canvas.setColor(Color.BLACK);
+               a /= 10;
+            }while(a != 0);
+
             //маркер
-            path.append(new Line2D.Double(center.getX() + 11.0, center.getY() - 0.0, center.getX() - 11.0, center.getY() - 0.0), true);
-            path.append(new Line2D.Double(center.getX() + 0.0, center.getY() + 11.0, center.getX() + 0.0, center.getY() - 11.0), true);
-            path.append(new  Ellipse2D.Double(center.getX() - 11.0,center.getY() - 11.0, 11, 11), true);
-            canvas.fill(path);
+            path.append(new Ellipse2D.Double(center.getX() - 5.5,center.getY() - 5.5, 11, 11), false);
+            path.append(new Line2D.Double(center.getX() + 5.5, center.getY() - 0.0, center.getX() - 5.5, center.getY() - 0.0), false);
+            path.append(new Line2D.Double(center.getX() + 0.0, center.getY() + 5.5, center.getX() + 0.0, center.getY() - 5.5), false);
             canvas.draw(path);
         }
     }
@@ -263,6 +268,10 @@ minY
 // Вывести надпись в точке с вычисленными координатами
             canvas.drawString("x", (float)(labelPos.getX() -
                     bounds.getWidth() - 10), (float)(labelPos.getY() + bounds.getY()));
+
+            Point2D.Double labelPos0 = xyToPoint(0, 0);
+            canvas.drawString("0", (float)(labelPos0.getX() -
+                    bounds.getWidth() - 10), (float)(labelPos0.getY() + bounds.getY() + 60));
         }
     }
 
