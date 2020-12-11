@@ -272,6 +272,10 @@ minY
             Point2D.Double labelPos0 = xyToPoint(0, 0);
             canvas.drawString("0", (float)(labelPos0.getX() -
                     bounds.getWidth() - 10), (float)(labelPos0.getY() + bounds.getY() + 60));
+
+
+            canvas.draw(new Line2D.Double(xyToPoint(0.5, -0.1),
+                    xyToPoint(0.5, 0.1)));
         }
     }
 
